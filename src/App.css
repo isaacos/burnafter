@@ -23,6 +23,21 @@
   color: #61dafb;
 }
 
+.message-board {
+  width: 40em;
+  height: 30em;
+  border: solid;
+}
+
+.right {
+  float:right;
+}
+
+input[type=text] {
+  width: 35em;
+  height: 5em;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
