@@ -2,8 +2,7 @@ import React, {Component} from 'react';
 import logo from './logo.svg';
 import './App.css';
 import MessagingDisplay from './component/MessagingDisplay.js';
-import UsersSidebar from './component/UsersSidebar.js';
-import { ActionCable } from 'react-actioncable-provider';
+import { ActionCableConsumer } from 'react-actioncable-provider';
 
 
 class App extends Component {
@@ -20,15 +19,18 @@ class App extends Component {
   }
 
 
+
   render (){
     return (
       <div>
-        <ActionCable
+        <ActionCableConsumer
         channel={{channel: 'UsersChannel'}}
         onReceived={newUser => this.setState({users: [newUser, ...this.state.users]})}
         />
-        <UsersSidebar users={this.state.users} />
-        <MessagingDisplay />
+        <div id="message-display-sidebar">
+
+          <MessagingDisplay users={this.state.users}/>
+        </div>
       </div>
     );
   }

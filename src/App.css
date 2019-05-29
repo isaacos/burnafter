@@ -33,6 +33,10 @@
   float:right;
 }
 
+.message-display-sidebar {
+  display: inline-grid;
+}
+
 input[type=text] {
   width: 35em;
   height: 5em;
