@@ -42,6 +42,14 @@ input[type=text] {
   height: 5em;
 }
 
+.chats {
+  float: left;
+  border: solid;
+  width: 30%;
+  height: 100%;
+  margin-right: 10vmin;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
