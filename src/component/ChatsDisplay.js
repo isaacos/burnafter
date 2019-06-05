@@ -10,11 +10,12 @@ class ChatsDisplay extends Component {
         <div className="chats">
           <Chats
             chatIds={this.props.chatIds}
+            selectChat={this.props.selectChat}
           />
         </div>
         <ul>
           {this.props.messages.map(message => {
-            if(message.chat_id === this.props.currentChat){
+            if(message.chat_id === this.props.currentChatId){
               return <li key={'k'+message.id}>{message.text}</li>
             }
           })}

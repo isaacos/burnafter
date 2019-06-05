@@ -7,9 +7,11 @@ import { ActionCableProvider } from 'react-actioncable-provider';
 
 ReactDOM.render(
   <ActionCableProvider url="ws://localhost:3090/newuser">
-  <ActionCableProvider url="ws://localhost:3090/chat">
-    <App />
-  </ActionCableProvider>
+    <ActionCableProvider url="ws://localhost:3090/chat">
+      <ActionCableProvider url="ws://localhost:3090/message">
+        <App />
+      </ActionCableProvider>
+    </ActionCableProvider>
   </ActionCableProvider>,
   document.getElementById('root'));
 
