@@ -28,6 +28,15 @@ class MessagingDisplay extends Component {
     .then(currentUser => this.setState({user: currentUser}))
   }
 
+
+
+  deleteUser = () => {
+    fetch(`http://localhost:3090/users/${this.state.user.id}`,{
+      method: 'DELETE'
+    })
+    this.setState({user: null, chatIds: [], messages: [], currentChatId: null})
+  }
+
   createChat = secondUser => {
     fetch('http://localhost:3090/chats', {
       method: 'POST',
@@ -58,6 +67,7 @@ class MessagingDisplay extends Component {
       })
     })
   }
+
 
   newChatHandler = (newChat, created = null) => {
     if(created === 'not null' || this.state.currentChatId === null){
@@ -110,6 +120,7 @@ class MessagingDisplay extends Component {
               <h3>{this.state.user.name}</h3>
               <input type="text" onChange={e => this.setState({messageInput: e.target.value})}/>
               <button onClick={() => this.createMessage()}>Send</button>
+              <button onClick={()=> this.deleteUser()}>logout</button>
             </div>
             :
             <p>
