@@ -70,9 +70,11 @@ class MessagingDisplay extends Component {
 
 
   newChatHandler = (newChat, created = null) => {
+    //not null is for when the newChat is recieved from the fetch promise instead of the channel
     if(created === 'not null' || this.state.currentChatId === null){
       this.setState({currentChatId: newChat.chat.id, chatIds: [newChat.chat.id, ...this.state.chatIds], messages: [...newChat.chat.messages, ...this.state.messages]})
-    } else {
+    }
+    else {
 
       this.setState({chatIds: [newChat.chat.id, ...this.state.chatIds], messages: [...newChat.chat.messages, ...this.state.messages]})
     }
