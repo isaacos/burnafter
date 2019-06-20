@@ -8,9 +8,9 @@ class MessagingDisplay extends Component {
     messageInput: '',
     userNameInput: '',
     user:  null,
-    chatIds: [],
+    chats: [],
     messages: [],
-    currentChatId: null
+    currentChat: null
   }
 
   createUser = () => {
@@ -34,7 +34,7 @@ class MessagingDisplay extends Component {
     fetch(`http://localhost:3090/users/${this.state.user.id}`,{
       method: 'DELETE'
     })
-    this.setState({user: null, chatIds: [], messages: [], currentChatId: null})
+    this.setState({user: null, chats: [], messages: [], currentChat: null})
   }
 
   createChat = secondUser => {
@@ -61,8 +61,9 @@ class MessagingDisplay extends Component {
         'Accept': 'application/json',
       },
       body: JSON.stringify({
-        chat_id: this.state.currentChatId,
+        chat_id: this.state.currentChat.id,
         user_id: this.state.user.id,
+        chat_unique_string: this.state.currentChat.unique_string,
         text: this.state.messageInput
       })
     })
@@ -71,17 +72,17 @@ class MessagingDisplay extends Component {
 
   newChatHandler = (newChat, created = null) => {
     //not null is for when the newChat is recieved from the fetch promise instead of the channel
-    if(created === 'not null' || this.state.currentChatId === null){
-      this.setState({currentChatId: newChat.chat.id, chatIds: [newChat.chat.id, ...this.state.chatIds], messages: [...newChat.chat.messages, ...this.state.messages]})
+    if(created === 'not null' || this.state.currentChat === null){
+      this.setState({currentChat: newChat.chat, chats: [newChat.chat, ...this.state.chats], messages: [...newChat.chat.messages, ...this.state.messages]})
     }
     else {
 
-      this.setState({chatIds: [newChat.chat.id, ...this.state.chatIds], messages: [...newChat.chat.messages, ...this.state.messages]})
+      this.setState({chats: [newChat.chat, ...this.state.chats], messages: [...newChat.chat.messages, ...this.state.messages]})
     }
   }
 
-  selectChat = chatId => {
-    this.setState({currentChatId: chatId})
+  selectChat = chat => {
+    this.setState({currentChat: chat})
   }
 
   newMessageHandler = newMessage => {
@@ -91,15 +92,17 @@ class MessagingDisplay extends Component {
 
 
   render () {
-    console.log(this.state.currentChatId)
+    console.log('chats', this.state.chats)
+    console.log('messages', this.state.messages )
+    console.log('current chat', this.state.currentChat)
     return(
       <div>
         <ActionCableConsumer
           channel={{channel: 'ChatChannel', user_id: this.state.user ? this.state.user.id : null}}
           onReceived={newChat => this.newChatHandler(newChat)}
         />
-        {this.state.chatIds.map(chatId =>  <div style={{display: 'none'}} key={'chatId' + chatId}><ActionCableConsumer
-          channel={{channel: 'MessageChannel', chat_id: chatId}}
+        {this.state.chats.map(chat =>  <div style={{display: 'none'}} key={'chatId' + chat.id}><ActionCableConsumer
+          channel={{channel: 'MessageChannel', unique_string: chat.unique_string}}
           onReceived={newMessage => this.newMessageHandler(newMessage)}
           />
           </div>
@@ -111,9 +114,9 @@ class MessagingDisplay extends Component {
         <div className="right">
           <div className="message-board">
             <ChatsDisplay
-              chatIds={this.state.chatIds}
+              chats={this.state.chats}
               messages={this.state.messages}
-              currentChatId={this.state.currentChatId}
+              currentChat={this.state.currentChat}
               selectChat={this.selectChat}
             />
           </div>
