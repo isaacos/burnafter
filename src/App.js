@@ -15,24 +15,22 @@ class App extends Component {
   componentDidMount(){
     fetch('http://localhost:3090/users')
     .then(r => r.json())
-    .then(r => this.setState({users: r}))
+    .then(users => this.setUsers(users))
   }
 
 
-
-
+  setUsers = users => {
+    this.setState({users: users})
+  }
 
   render (){
     return (
       <div>
         <ActionCableConsumer
-        channel={{channel: 'UsersChannel'}}
-        onReceived={newUser => this.setState({users: [newUser, ...this.state.users]})}
+          channel={{channel: 'UsersChannel'}}
+          onReceived={users => this.setUsers(users)}
         />
-        <div id="message-display-sidebar">
-
-          <MessagingDisplay users={this.state.users}/>
-        </div>
+        <MessagingDisplay users={this.state.users}/>
       </div>
     );
   }
