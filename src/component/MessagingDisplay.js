@@ -28,12 +28,12 @@ class MessagingDisplay extends Component {
     .then(currentUser => this.setState({user: currentUser}))
   }
 
-
-
   deleteUser = () => {
     fetch(`http://localhost:3090/users/${this.state.user.id}`,{
       method: 'DELETE'
     })
+    .then(r => r.json())
+    .then(r => r)
     this.setState({user: null, chats: [], messages: [], currentChat: null})
   }
 
@@ -90,51 +90,51 @@ class MessagingDisplay extends Component {
   }
 
 
-
   render () {
-    console.log('chats', this.state.chats)
-    console.log('messages', this.state.messages )
-    console.log('current chat', this.state.currentChat)
     return(
       <div>
         <ActionCableConsumer
           channel={{channel: 'ChatChannel', user_id: this.state.user ? this.state.user.id : null}}
           onReceived={newChat => this.newChatHandler(newChat)}
         />
-        {this.state.chats.map(chat =>  <div style={{display: 'none'}} key={'chatId' + chat.id}><ActionCableConsumer
-          channel={{channel: 'MessageChannel', unique_string: chat.unique_string}}
-          onReceived={newMessage => this.newMessageHandler(newMessage)}
-          />
-          </div>
-        )}
-        <UsersSidebar
-          users={this.props.users}
-          createChat={this.createChat}
-        />
-        <div className="right">
-          <div className="message-board">
-            <ChatsDisplay
-              chats={this.state.chats}
-              messages={this.state.messages}
-              currentChat={this.state.currentChat}
-              selectChat={this.selectChat}
+        {this.state.chats.map(chat => {
+            return <div style={{display: 'none'}} key={'chatId' + chat.id}>
+            <ActionCableConsumer
+              channel={{channel: 'MessageChannel', unique_string: chat.unique_string}}
+              onReceived={newMessage => this.newMessageHandler(newMessage)}
             />
           </div>
-          {this.state.user ?
-            <div>
-              <h3>{this.state.user.name}</h3>
-              <input type="text" onChange={e => this.setState({messageInput: e.target.value})}/>
-              <button onClick={() => this.createMessage()}>Send</button>
-              <button onClick={()=> this.deleteUser()}>logout</button>
-            </div>
-            :
-            <p>
-              <input placeholder='user name' onChange={e => this.setState({userNameInput: e.target.value})}/>
-              <button onClick={() => this.createUser()}>activate</button>
-            </p>
           }
+        )}
+
+          <div className="right">
+            <div className="message-board">
+              <ChatsDisplay
+                chats={this.state.chats}
+                messages={this.state.messages}
+                currentChat={this.state.currentChat}
+                selectChat={this.selectChat}
+              />
+            </div>
+            {this.state.user ?
+              <div>
+                <h3>{this.state.user.name}</h3>
+                <input type="text" onChange={e => this.setState({messageInput: e.target.value})}/>
+                <button onClick={() => this.createMessage()}>Send</button>
+                <button onClick={()=> this.deleteUser()}>logout</button>
+              </div>
+              :
+              <p>
+                <input placeholder='user name' onChange={e => this.setState({userNameInput: e.target.value})}/>
+                <button onClick={() => this.createUser()}>activate</button>
+              </p>
+            }
+          </div>
+            <UsersSidebar
+              users={this.props.users}
+              createChat={this.createChat}
+            />
         </div>
-      </div>
     )
   }
 }
