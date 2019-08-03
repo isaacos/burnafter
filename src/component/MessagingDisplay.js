@@ -2,12 +2,12 @@ import React, { Component } from 'react';
 import UsersSidebar from './UsersSidebar.js';
 import ChatsDisplay from './ChatsDisplay.js';
 import { ActionCableConsumer } from 'react-actioncable-provider';
+import { connect } from 'react-redux';
 
 class MessagingDisplay extends Component {
   state = {
     messageInput: '',
     userNameInput: '',
-    user:  null,
     chats: [],
     messages: [],
     currentChat: null
@@ -25,16 +25,16 @@ class MessagingDisplay extends Component {
       })
     })
     .then(r => r.json())
-    .then(currentUser => this.setState({user: currentUser}))
+    .then(currentUser => this.props.loginUser(currentUser))
   }
 
   deleteUser = () => {
-    fetch(`http://localhost:3090/users/${this.state.user.id}`,{
+    fetch(`http://localhost:3090/users/${this.props.user.id}`,{
       method: 'DELETE'
     })
     .then(r => r.json())
     .then(r => r)
-    this.setState({user: null, chats: [], messages: [], currentChat: null})
+    this.props.logOutUser()
   }
 
   createChat = secondUser => {
@@ -45,7 +45,7 @@ class MessagingDisplay extends Component {
         'Accept': 'application/json',
       },
       body: JSON.stringify({
-        first_user: this.state.user.id,
+        first_user: this.props.user.id,
         second_user: secondUser.id
       })
     })
@@ -61,9 +61,9 @@ class MessagingDisplay extends Component {
         'Accept': 'application/json',
       },
       body: JSON.stringify({
-        chat_id: this.state.currentChat.id,
-        user_id: this.state.user.id,
-        chat_unique_string: this.state.currentChat.unique_string,
+        chat_id: this.props.currentChat.id,
+        user_id: this.props.user.id,
+        chat_unique_string: this.props.currentChat.unique_string,
         text: this.state.messageInput
       })
     })
@@ -72,36 +72,28 @@ class MessagingDisplay extends Component {
 
   newChatHandler = (newChat, created = null) => {
     //not null is for when the newChat is recieved from the fetch promise instead of the channel
-    if(created === 'not null' || this.state.currentChat === null){
-      this.setState({currentChat: newChat.chat, chats: [newChat.chat, ...this.state.chats], messages: [...newChat.chat.messages, ...this.state.messages]})
+    if(created === 'not null' || this.props.currentChat === null){
+      this.props.newChatWithNullCurrentChat(newChat.chat, newChat.chat.messages)
     }
     else {
-
-      this.setState({chats: [newChat.chat, ...this.state.chats], messages: [...newChat.chat.messages, ...this.state.messages]})
+      this.props.newChat(newChat.chat, newChat.chat.messages)
     }
   }
 
-  selectChat = chat => {
-    this.setState({currentChat: chat})
-  }
-
-  newMessageHandler = newMessage => {
-    this.setState({messages: [...this.state.messages, newMessage]})
-  }
 
 
   render () {
     return(
       <div>
         <ActionCableConsumer
-          channel={{channel: 'ChatChannel', user_id: this.state.user ? this.state.user.id : null}}
+          channel={{channel: 'ChatChannel', user_id: this.props.user ? this.props.user.id : null}}
           onReceived={newChat => this.newChatHandler(newChat)}
         />
-        {this.state.chats.map(chat => {
+        {this.props.chats.map(chat => {
             return <div style={{display: 'none'}} key={'chatId' + chat.id}>
             <ActionCableConsumer
               channel={{channel: 'MessageChannel', unique_string: chat.unique_string}}
-              onReceived={newMessage => this.newMessageHandler(newMessage)}
+              onReceived={newMessage => this.props.newMessageHandler(newMessage)}
             />
           </div>
           }
@@ -109,16 +101,11 @@ class MessagingDisplay extends Component {
 
           <div className="right">
             <div className="message-board">
-              <ChatsDisplay
-                chats={this.state.chats}
-                messages={this.state.messages}
-                currentChat={this.state.currentChat}
-                selectChat={this.selectChat}
-              />
+              <ChatsDisplay/>
             </div>
-            {this.state.user ?
+            {this.props.user ?
               <div>
-                <h3>{this.state.user.name}</h3>
+                <h3>{this.props.user.name}</h3>
                 <input type="text" onChange={e => this.setState({messageInput: e.target.value})}/>
                 <button onClick={() => this.createMessage()}>Send</button>
                 <button onClick={()=> this.deleteUser()}>logout</button>
@@ -131,7 +118,6 @@ class MessagingDisplay extends Component {
             }
           </div>
             <UsersSidebar
-              users={this.props.users}
               createChat={this.createChat}
             />
         </div>
@@ -139,4 +125,16 @@ class MessagingDisplay extends Component {
   }
 }
 
-export default MessagingDisplay;
+const mapStateToProps = state => {
+  return state
+}
+
+const mapDispatchToProps = {
+  loginUser: (user) => ({type: 'LOGINUSER', user}),
+  newChat: (chats, messages) => ({type: 'NEWCHAT', chats, messages}),
+  newChatWithNullCurrentChat: (chats, messages) => ({type: 'NEWCHATWITHNULLCURRENTCHAT', chats, messages}),
+  newMessageHandler: (message) => ({type: 'NEWMESSAGE', message}),
+  logOutUser: () => ({type: 'LOGOUTUSER'})
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(MessagingDisplay);

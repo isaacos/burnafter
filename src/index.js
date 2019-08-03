@@ -2,17 +2,44 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import {Provider} from 'react-redux';
+import { createStore} from 'redux'
 import * as serviceWorker from './serviceWorker';
 import { ActionCableProvider } from 'react-actioncable-provider';
 
+const reducer = (state = {users: [], user: null, chats: [], currentChat: null, messages: []}, action) => {
+  switch(action.type){
+    case 'SETUSERS':
+      return {...state, users: action.users}
+    case 'LOGINUSER':
+      return {...state, user: action.user}
+    case 'NEWCHAT':
+      return {...state, chats: [action.chats, ...state.chats], messages: [...state.messages, ...action.messages]}
+    case 'NEWCHATWITHNULLCURRENTCHAT':
+      return {...state, currentChat: action.chats, chats: [action.chats, ...state.chats], messages: [...state.messages, ...action.messages]}
+    case 'NEWMESSAGE':
+      return {...state, messages: [...state.messages, action.message]}
+    case 'LOGOUTUSER':
+      return {...state, user: null, chats: [], messages: [], currentChat: null}
+    case 'SELECTCHAT':
+      return {...state, currentChat: action.chat}
+    default:
+      return state
+  }
+}
+
+const store = createStore(reducer)
+
 ReactDOM.render(
-  <ActionCableProvider url="ws://localhost:3090/newuser">
-    <ActionCableProvider url="ws://localhost:3090/chat">
-      <ActionCableProvider url="ws://localhost:3090/message">
-        <App />
-      </ActionCableProvider>
+  <Provider store={store}>
+    <ActionCableProvider url="ws://localhost:3090/newuser">
+        <ActionCableProvider url="ws://localhost:3090/chat">
+            <ActionCableProvider url="ws://localhost:3090/message">
+                <App />
+            </ActionCableProvider>
+        </ActionCableProvider>
     </ActionCableProvider>
-  </ActionCableProvider>,
+  </Provider>,
   document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
