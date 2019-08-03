@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Chats from './Chats.js';
+import { connect } from 'react-redux';
 
 class ChatsDisplay extends Component {
 
@@ -8,8 +9,6 @@ class ChatsDisplay extends Component {
       <div>
         <div className="chats">
           <Chats
-            chats={this.props.chats}
-            selectChat={this.props.selectChat}
           />
         </div>
         <ul>
@@ -25,4 +24,10 @@ class ChatsDisplay extends Component {
   }
 }
 
-export default ChatsDisplay
+const mapStateToProps = state => {
+  return state
+}
+
+
+
+export default connect(mapStateToProps)(ChatsDisplay);
