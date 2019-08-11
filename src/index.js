@@ -7,7 +7,7 @@ import { createStore} from 'redux'
 import * as serviceWorker from './serviceWorker';
 import { ActionCableProvider } from 'react-actioncable-provider';
 
-const reducer = (state = {users: [], user: null, chats: [], currentChat: null, messages: []}, action) => {
+const reducer = (state = {users: [], user: null, chats: [], currentChat: null, messages: [], timeAngle: -1.55}, action) => {
   switch(action.type){
     case 'SETUSERS':
       return {...state, users: action.users}
@@ -23,6 +23,8 @@ const reducer = (state = {users: [], user: null, chats: [], currentChat: null, m
       return {...state, user: null, chats: [], messages: [], currentChat: null}
     case 'SELECTCHAT':
       return {...state, currentChat: action.chat}
+    case 'COUNTDOWN':
+      return {...state, timeAngle: state.timeAngle + 0.01}
     default:
       return state
   }

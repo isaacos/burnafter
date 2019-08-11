@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import UsersSidebar from './UsersSidebar.js';
 import ChatsDisplay from './ChatsDisplay.js';
+import CountdownClock from './CountdownClock.js';
 import { ActionCableConsumer } from 'react-actioncable-provider';
 import { connect } from 'react-redux';
 
@@ -120,6 +121,7 @@ class MessagingDisplay extends Component {
             <UsersSidebar
               createChat={this.createChat}
             />
+            <CountdownClock />
         </div>
     )
   }
