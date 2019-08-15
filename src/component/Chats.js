@@ -1,7 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
-
 function Chats (props){
   return (
     <ul>
