@@ -99,7 +99,6 @@ class MessagingDisplay extends Component {
           </div>
           }
         )}
-
           <div className="right">
             <div className="message-board">
               <ChatsDisplay/>

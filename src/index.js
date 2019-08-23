@@ -34,13 +34,11 @@ const store = createStore(reducer)
 
 ReactDOM.render(
   <Provider store={store}>
-    <ActionCableProvider url="ws://localhost:3090/newuser">
-        <ActionCableProvider url="ws://localhost:3090/chat">
-            <ActionCableProvider url="ws://localhost:3090/message">
-                <App />
-            </ActionCableProvider>
-        </ActionCableProvider>
-    </ActionCableProvider>
+      <ActionCableProvider url="ws://localhost:3090/chat">
+          <ActionCableProvider url="ws://localhost:3090/message">
+              <App />
+          </ActionCableProvider>
+      </ActionCableProvider>
   </Provider>,
   document.getElementById('root'));
 
